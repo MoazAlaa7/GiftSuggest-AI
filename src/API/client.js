@@ -1,9 +1,8 @@
 import OpenAI from "openai";
-import { API_KEY, API_URL, AI_MODEL } from "/env";
 
 const client = new OpenAI({
-  apiKey: API_KEY,
-  baseURL: API_URL,
+  apiKey: import.meta.env.VITE_API_KEY,
+  baseURL: import.meta.env.VITE_API_URL,
   dangerouslyAllowBrowser: true,
 });
 
@@ -22,7 +21,7 @@ const systemMessage = {
 export default async function getSuggestions(prompt, onChunk) {
   try {
     const stream = await client.chat.completions.create({
-      model: AI_MODEL,
+      model: import.meta.env.VITE_AI_MODEL,
       messages: [
         systemMessage,
         {
