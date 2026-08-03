@@ -10,23 +10,18 @@ const client = new OpenAI({
 const systemMessage = {
   role: "system",
   content: `
-            "If a question is outside of gift suggestions, politely decline to answer."
-            "Skip intros and conclusions. Only output gift suggestions."
-            "Answer ONLY in plain text."
-            "Adhere strictly to the user's specified price range (if provided)."
-            "Do not recommend age-inappropriate, legally restricted, or sensitive items (e.g., alcohol, weapons, tobacco, or adult content)"`,
+            Make your gift suggestions thoughtful and practical.
+            Skip intros and conclusions.
+            Only output gift suggestions.
+            Your response must be under 300 words.
+            Adhere strictly to the user's specified price range (if provided).
+            Do not recommend age-inappropriate, legally restricted, or sensitive items (e.g., alcohol, weapons, tobacco, or adult content)
+            If a question is outside of gift suggestions, politely decline to answer.`,
 };
 
-export default async function getSuggestions() {
-  const prompt = "Suggest some gifts for someone who loves cats";
-
-  console.log("Prompt:", prompt);
-  console.log("Making AI request...");
-
-  //    "If a question is outside of data analysis, politely decline to answer"
-
+export default async function getSuggestions(prompt, onChunk) {
   try {
-    const response = await client.chat.completions.create({
+    const stream = await client.chat.completions.create({
       model: AI_MODEL,
       messages: [
         systemMessage,
@@ -35,21 +30,24 @@ export default async function getSuggestions() {
           content: prompt,
         },
       ],
+      stream: true,
     });
 
-    console.log("AI response:");
-    console.log(response.choices[0].message.content);
-  } catch (err) {
-    if (err.status === 401 || err.status === 403) {
-      console.error(
-        "Authentication error: Check your AI_KEY and make sure it’s valid.",
-      );
-    } else if (err.status >= 500) {
-      console.error(
-        "AI provider error: Something went wrong on the provider side. Try again shortly.",
-      );
-    } else {
-      console.error("Unexpected error:", err.message || err);
+    let fullResponse = "";
+
+    for await (const chunk of stream) {
+      const chunkContent = chunk.choices[0].delta.content;
+
+      if (chunkContent) {
+        fullResponse += chunkContent;
+        onChunk(fullResponse);
+      }
     }
+
+    return fullResponse;
+  } catch (err) {
+    throw new Error("Sorry, something went wrong. Please try again in a bit.", {
+      cause: err,
+    });
   }
 }
