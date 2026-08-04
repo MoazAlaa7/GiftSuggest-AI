@@ -1,5 +1,4 @@
 import "./App.css";
-import getSuggestions from "./API/client";
 import { useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
@@ -17,13 +16,34 @@ function App() {
     setIsPending(true);
 
     try {
-      const fullResponse = await getSuggestions(prompt, (partial) => {
-        setResponse(partial);
+      const response = await fetch("/api/gift", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
       });
 
-      setResponse(fullResponse);
-    } catch (err) {
-      setResponse(err instanceof Error ? err.message : "Something went wrong.");
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let fullResponse = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+
+        if (done) break;
+
+        fullResponse += decoder.decode(value);
+
+        setResponse(fullResponse);
+      }
+    } catch (error) {
+      setResponse("Something went wrong. Please try again later.");
     } finally {
       setIsPending(false);
     }
