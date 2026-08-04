@@ -27,9 +27,9 @@ const systemMessage = {
 
 export default async function getSuggestions(prompt, onChunk) {
   try {
-    const stream = await client.chat.completions.create({
+    const stream = await client.responses.create({
       model: import.meta.env.VITE_AI_MODEL,
-      messages: [
+      input: [
         systemMessage,
         {
           role: "user",
@@ -41,11 +41,9 @@ export default async function getSuggestions(prompt, onChunk) {
 
     let fullResponse = "";
 
-    for await (const chunk of stream) {
-      const chunkContent = chunk.choices[0].delta.content;
-
-      if (chunkContent) {
-        fullResponse += chunkContent;
+    for await (const event of stream) {
+      if (event.type === "response.output_text.delta") {
+        fullResponse += event.delta;
         onChunk(fullResponse);
       }
     }
