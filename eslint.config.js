@@ -7,9 +7,8 @@ import { defineConfig, globalIgnores } from "eslint/config";
 export default defineConfig([
   globalIgnores(["dist"]),
 
-  // Node (Express)
   {
-    files: ["server.js"],
+    files: ["api/**/*.js"],
     languageOptions: {
       globals: globals.node,
     },
