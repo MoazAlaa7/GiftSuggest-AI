@@ -1,9 +1,15 @@
+import express from "express";
 import OpenAI from "openai";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
 
 const client = new OpenAI({
-  apiKey: import.meta.env.VITE_API_KEY,
-  baseURL: import.meta.env.VITE_API_URL,
-  dangerouslyAllowBrowser: true,
+  apiKey: process.env.API_KEY,
+  baseURL: process.env.API_URL,
 });
 
 const systemMessage = {
@@ -25,10 +31,13 @@ const systemMessage = {
             If a question is outside of gift suggestions, politely decline to answer.`,
 };
 
-export default async function getSuggestions(prompt, onChunk) {
+app.post("/api/gift", async (req, res) => {
   try {
+    const { prompt } = req.body;
+
     const stream = await client.responses.create({
-      model: import.meta.env.VITE_AI_MODEL,
+      model: process.env.AI_MODEL,
+
       input: [
         systemMessage,
         {
@@ -36,22 +45,27 @@ export default async function getSuggestions(prompt, onChunk) {
           content: prompt,
         },
       ],
+
       stream: true,
     });
 
-    let fullResponse = "";
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Transfer-Encoding", "chunked");
 
     for await (const event of stream) {
       if (event.type === "response.output_text.delta") {
-        fullResponse += event.delta;
-        onChunk(fullResponse);
+        res.write(event.delta);
       }
     }
 
-    return fullResponse;
+    res.end();
   } catch (err) {
-    throw new Error("Sorry, something went wrong. Please try again in a bit.", {
-      cause: err,
-    });
+    console.error(err);
+    res.status(500).end("Something went wrong.");
   }
-}
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
