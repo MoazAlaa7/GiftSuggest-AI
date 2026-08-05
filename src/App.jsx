@@ -2,8 +2,10 @@ import "./App.css";
 import { useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
+import { useTranslation } from "react-i18next";
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [response, setResponse] = useState("");
   const [isPending, setIsPending] = useState(false);
 
@@ -43,7 +45,7 @@ function App() {
         setResponse(fullResponse);
       }
     } catch (error) {
-      setResponse("Something went wrong. Please try again later.");
+      setResponse(t("errorMessage"));
     } finally {
       setIsPending(false);
     }
@@ -53,10 +55,19 @@ function App() {
   const cleanHTML = DOMPurify.sanitize(html);
 
   return (
-    <div className="app-container">
+    <div className="app-container" dir={i18n.dir()}>
       <header>
         <img src="/favicon.png" alt="gift box image" />
-        <h1>AI Gift Suggestion</h1>
+        <h1>{t("appTitle")}</h1>
+        <button
+          type="button"
+          className="lang-switch"
+          onClick={() =>
+            i18n.changeLanguage(i18n.language === "ar" ? "en" : "ar")
+          }
+        >
+          {i18n.language === "ar" ? "EN" : "العربية"}
+        </button>
       </header>
 
       <main className="main-content">
@@ -64,8 +75,8 @@ function App() {
           <textarea
             id="user-input"
             name="user-input"
-            aria-label="Type your message"
-            placeholder="e.g., My friend who loves hiphop music has a birthday coming up in 3 days. suggest a gift.."
+            aria-label={t("ariaLabel")}
+            placeholder={t("placeholder")}
           ></textarea>
 
           <button
@@ -74,7 +85,7 @@ function App() {
             className="submit-btn"
             disabled={isPending}
           >
-            {isPending ? "Generating..." : "Generate ideas"}
+            {isPending ? t("buttonGenerating") : t("buttonGenerate")}
           </button>
         </form>
 

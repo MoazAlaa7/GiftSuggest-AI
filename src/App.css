@@ -37,6 +37,21 @@ header img {
   filter: drop-shadow(0 0 8px gold);
 }
 
+.lang-switch {
+  margin-left: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.lang-switch:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .main-content {
   display: flex;
   flex-direction: column;
@@ -147,8 +162,13 @@ textarea::placeholder {
 
 #output-content ul,
 #output-content ol {
-  padding-left: 1em;
+  padding-inline-start: 1em;
   margin: 0.25em 0;
+}
+
+#output-content ul,
+#output-content ol {
+  list-style-position: inside;
 }
 
 #output-content ul {
@@ -161,7 +181,7 @@ textarea::placeholder {
 
 #output-content li {
   margin-bottom: 0.2em;
-  padding-left: 0.25em;
+  padding-inline-start: 0.25em;
 }
 
 #output-content li::marker {

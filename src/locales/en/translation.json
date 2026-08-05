@@ -1,0 +1,8 @@
+{
+  "appTitle": "AI Gift Suggestion",
+  "ariaLabel": "Type your message",
+  "placeholder": "e.g., My friend who loves hiphop music has a birthday coming up in 3 days. suggest a gift..",
+  "buttonGenerate": "Generate ideas",
+  "buttonGenerating": "Generating...",
+  "errorMessage": "Something went wrong. Please try again later."
+}
