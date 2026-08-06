@@ -5,7 +5,9 @@
 }
 
 body {
-  background-color: rgb(30 30 51);
+  background-image: url(/bg.png);
+  background-size: cover;
+  background-position: center;
   font-family: "Inter", system-ui, sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
