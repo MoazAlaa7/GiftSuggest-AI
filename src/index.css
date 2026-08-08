@@ -5,7 +5,7 @@
 }
 
 body {
-  background-image: url(/bg.png);
+  background-image: url(/bg.webp);
   background-size: cover;
   background-position: center;
   font-family: "Inter", system-ui, sans-serif;
